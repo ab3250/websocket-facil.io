@@ -6,8 +6,6 @@
 #include "redis_engine.h"
 #include "websockets.h"
 #include <string.h>
-#include "websockets.c"
-
 
 static sexp ctx2;
 static void on_http_request(http_s *h);
@@ -19,6 +17,21 @@ static void ws_on_message(ws_s *ws, fio_str_info_s msg, uint8_t is_text);
 static void ws_on_shutdown(ws_s *ws);
 static void ws_on_close(intptr_t uuid, void *udata);
 static void ws_write(sexp ws, char *msg, int len, int is_text);
+static void ws_on_timer1(void);
+
+static void ws_on_timer1(void) {
+ sexp ctx = ctx2;
+ sexp_gc_var3(cmd,arg_sym,arg_val); 
+ sexp_gc_preserve3(ctx,cmd,arg_sym,arg_val);
+ //arg_sym=sexp_intern(ctx, "wsptr", -1); 
+ //arg_val=ws;
+ //sexp_env_define(ctx, sexp_context_env(ctx), arg_sym, arg_val);
+ //arg_sym=sexp_intern(ctx, "msg", -1); 
+ //arg_val=sexp_c_string(ctx,msg.data,-1);
+ //sexp_env_define(ctx, sexp_context_env(ctx), arg_sym, arg_val);
+ cmd = sexp_eval_string(ctx, "(ontimer1)", -1, NULL);
+ sexp_gc_release3(ctx);
+}
 
 static void ws_write(sexp ws, char *msg, int len, int is_text)
 {  
@@ -32,8 +45,8 @@ int ws_init(void) {
   const char *port = "8080";
   const char *address = "127.0.0.1";
   const char *public_folder = "www";
-  uint32_t threads = 3;
-  uint32_t workers = 3;
+  uint32_t threads = 1;
+  uint32_t workers = 1;
   uint8_t print_log = 0;
   
  
@@ -47,17 +60,30 @@ int ws_init(void) {
                   .public_folder = public_folder,
                   .log = 0,
                   .timeout = 10,
-                  .tls = tls,
+         //        .tls = tls,
                   .ws_timeout = 0) == -1) {
   //  /* listen failed ?*/
      perror(
          "ERROR: facil.io couldn't initialize HTTP service (already running?)");
      exit(1);
     }
+/////
+
+  // fio_mark_time(); 
+  // fio_timer_clear_all(); 
+   struct timespec start = fio_last_tick(); 
+   // struct timespec start = fio_last_tick(); 
+   fio_run_every(5000, 0, ws_on_timer1, NULL, NULL);
   
+
+/////
    fio_start(.threads = threads, .workers = workers);
    fio_cli_end();
    fio_tls_destroy(tls);
+//
+  struct timespec end = fio_last_tick(); 
+  //fio_timer_clear_all();
+   //
    return(0);
   }
 
