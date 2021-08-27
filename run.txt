@@ -1,0 +1,5 @@
+./ws -p 8000 -b 127.0.0.1 -public ./ -V 1
+
+gcc -lchibi-scheme -pthread -Wall -Wextra -O2 \
+	 -I /usr/local/include -I ./lib2/ -std=c99 -pedantic -fPIC
+	 -shared chibized-websocket2.c libfacil.io.a -o websocket.so
