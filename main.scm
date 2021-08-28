@@ -81,13 +81,6 @@
     (set! gblWs wsptr)
     (ws_write gblWs  "howdy2"  6  1))
 
-<<<<<<< HEAD
-(define (set-timer)
-(fio_run_every_wrap 9000 0 "timer1")
-)
-
-=======
->>>>>>> parent of c8c2b1c (big changes)
 (define (ontimer1)
     (let ((len2 (string-length (json->string(knuth-shuffle deck2))))(len (string-length (json->string(knuth-shuffle deck)))))
    ; (ws_write gblWs (json->string(knuth-shuffle deck2)) len2   1) 
