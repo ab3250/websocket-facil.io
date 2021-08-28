@@ -23,6 +23,12 @@ extern void fio_timer_clear_all(void);
 
 static int fio_run_every_wrap(size_t interval, size_t repeat, char * func)
 {
+    if (strcmp(func , "timer1") == 0){
+      printf("%i",fio_run_every(interval, repeat, ws_on_timer1, NULL, NULL));
+       printf(func);
+
+    }
+
  //void (*fun_ptr)(int) = &fun;
   // fun_ptr is a pointer to function fun() 
   //  void (*fun_ptr)(int) = &fun;
@@ -34,8 +40,25 @@ static int fio_run_every_wrap(size_t interval, size_t repeat, char * func)
   
     // Invoking fun() using fun_ptr
   //  (*fun_ptr)(10);
+//   void do_fork()
+// {
+//     printf ("Fork called.\n");
+// }
+
+// void callFunc(char *funcName)
+// {
+//     if (strcmp(funcName, "do_fork") == 0) do_fork();
+// }
+
+// int main()
+// {
+//     char *pFunc = "do_fork";
+//     callFunc(pFunc);
+//     return 0;
+// }
+
   
- printf(func);
+
 
 }
 
@@ -100,7 +123,7 @@ int ws_init(void) {
  //sexp_env_define(ctx, sexp_context_env(ctx), arg_sym, arg_val);
  sexp_eval_string(ctx, "(set-timer)", -1, NULL);
 // sexp_gc_release3(ctx); 
-   fio_run_every(9000, 0, ws_on_timer1, NULL, NULL);
+   
   
 
 /////

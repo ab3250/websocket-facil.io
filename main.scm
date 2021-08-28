@@ -82,12 +82,12 @@
     (ws_write gblWs  "howdy2"  6  1))
 
 (define (set-timer)
-(fio_run_every_wrap 9000 0 "ws_on_timer1" )
+(fio_run_every_wrap 9000 0 "timer1")
 )
 
 (define (ontimer1)
     (let ((len2 (string-length (json->string(knuth-shuffle deck2))))(len (string-length (json->string(knuth-shuffle deck)))))
-    (ws_write gblWs (json->string(knuth-shuffle deck2)) len2   1) 
+   ; (ws_write gblWs (json->string(knuth-shuffle deck2)) len2   1) 
     (ws_write gblWs (json->string(knuth-shuffle deck)) len   1) 
     (set! count (+ count 1))))
 
