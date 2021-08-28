@@ -132,7 +132,7 @@ int ws_init(void) {
 
 /////
    fio_start(.threads = threads, .workers = workers);
-   fio_cli_end();
+  // fio_cli_end();
   // fio_tls_destroy(tls);
 //
  // struct timespec end = fio_last_tick(); 
@@ -239,113 +239,6 @@ static void ws_on_close(intptr_t uuid, void *udata) {
 }
 
 
-
-///* *****************************************************************************
-//Redis initialization
-//***************************************************************************** */
-// static void initialize_redis(void) {
-//   if (!fio_cli_get("-redis") || !strlen(fio_cli_get("-redis")))
-//     return;
-//   FIO_LOG_STATE("* Initializing Redis connection to %s\n",
-//                 fio_cli_get("-redis"));
-//   fio_url_s info =
-//       fio_url_parse(fio_cli_get("-redis"), strlen(fio_cli_get("-redis")));
-//   fio_pubsub_engine_s *e =
-//       redis_engine_create(.address = info.host, .port = info.port,
-//                           .auth = info.password);
-//   if (e)
-//     fio_state_callback_add(FIO_CALL_ON_FINISH,
-//                            (void (*)(void *))redis_engine_destroy, e);
-//   FIO_PUBSUB_DEFAULT = e;
-// }
-
-///* *****************************************************************************
-//CLI helpers
-//***************************************************************************** */
-static void initialize_cli(int argc, char const *argv[]) {
- 
-//  /*     ****  Command line arguments ****     */
-  fio_cli_start(
-      argc, argv, 0, 0, NULL,
-      // Address Binding
-      FIO_CLI_PRINT_HEADER("Address Binding:"),
-      FIO_CLI_INT("-port -p port number to listen to. defaults port 3000"),
-      "-bind -b address to listen to. defaults any available.",
-      FIO_CLI_BOOL("-tls use a self signed certificate for TLS."),
-      // Concurrency
-      FIO_CLI_PRINT_HEADER("Concurrency:"),
-      FIO_CLI_INT("-workers -w number of processes to use."),
-      FIO_CLI_INT("-threads -t number of threads per process."),
-      // HTTP Settings
-      FIO_CLI_PRINT_HEADER("HTTP Settings:"),
-      "-public -www public folder, for static file service.",
-      FIO_CLI_INT(
-          "-keep-alive -k HTTP keep-alive timeout (0..255). default: 10s"),
-      FIO_CLI_INT(
-          "-max-body -maxbd HTTP upload limit in Mega Bytes. default: 50Mb"),
-      FIO_CLI_BOOL("-log -v request verbosity (logging)."),
-      // WebSocket Settings
-      FIO_CLI_PRINT_HEADER("WebSocket Settings:"),
-      FIO_CLI_INT("-ping websocket ping interval (0..255). default: 40s"),
-      FIO_CLI_INT("-max-msg -maxms incoming websocket message "
-                  "size limit in Kb. default: 250Kb"),
-      // Misc Settings
-      FIO_CLI_PRINT_HEADER("Misc:"),
-      FIO_CLI_STRING("-redis -r an optional Redis URL server address."),
-      FIO_CLI_PRINT("\t\ta valid Redis URL would follow the pattern:"),
-      FIO_CLI_PRINT("\t\t\tredis://user:password@localhost:6379/"),
-      FIO_CLI_INT("-verbosity -V facil.io verbocity 0..5 (logging level)."));
-
- // /* Test and set any default options */
-  if (!fio_cli_get("-p")) {
-   // /* Test environment as well */
-    char *tmp = getenv("PORT");
-    if (!tmp)
-      tmp = "8080";
-   // /* CLI et functions (unlike fio_cli_start) ignores aliases */
-    fio_cli_set("-p", tmp);
-    fio_cli_set("-port", tmp);
-  }
-  if (!fio_cli_get("-b")) {
-    char *tmp = getenv("ADDRESS");
-    if (tmp) {
-      fio_cli_set("-b", tmp);
-      fio_cli_set("-bind", tmp);
-    }
-  }
-  if (!fio_cli_get("-public")) {
-    char *tmp = getenv("HTTP_PUBLIC_FOLDER");
-    if (tmp) {
-      fio_cli_set("-public", tmp);
-      fio_cli_set("-www", tmp);
-    }
-  }
-
-  if (!fio_cli_get("-redis")) {
-    char *tmp = getenv("REDIS_URL");
-    if (tmp) {
-      fio_cli_set("-redis", tmp);
-      fio_cli_set("-r", tmp);
-    }
-  }
-  if (fio_cli_get("-V")) {
-    FIO_LOG_LEVEL = fio_cli_get_i("-V");
-  }
-
-  fio_cli_set_default("-ping", "40");
-
-  ///* CLI set functions (unlike fio_cli_start) ignores aliases */
-  fio_cli_set_default("-k", "10");
-  fio_cli_set_default("-keep-alive", "10");
-
-  fio_cli_set_default("-max-body", "50");
-  fio_cli_set_default("-maxbd", "50");
-
-  fio_cli_set_default("-max-message", "250");
-  fio_cli_set_default("-maxms", "250");
-}
-
-//websocket_write((ws_s *)pr, msg->msg, txt & 1);
 sexp sexp_ws_write_stub (sexp ctx, sexp self, sexp_sint_t n, sexp arg0, sexp arg1, sexp arg2, sexp arg3) {
   sexp res;
   if (! sexp_stringp(arg1))
