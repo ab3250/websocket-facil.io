@@ -20,6 +20,7 @@ static void ws_write(sexp ws, char *msg, int len, int is_text);
 static void ws_on_timer1(void);
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 static int fio_run_every_wrap(size_t interval, size_t repeat, char * func);
 extern void fio_timer_clear_all(void);
 
@@ -67,6 +68,8 @@ static int fio_run_every_wrap(size_t interval, size_t repeat, char * func)
 >>>>>>> parent of c8c2b1c (big changes)
 =======
 >>>>>>> parent of c8c2b1c (big changes)
+=======
+>>>>>>> ddff3b9b4bd2df6f125279f8d1476863df4f17e4
 
 static void ws_on_timer1(void) {
  sexp ctx = ctx2;
@@ -119,6 +122,9 @@ int ws_init(void) {
 /////
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> ddff3b9b4bd2df6f125279f8d1476863df4f17e4
    //fio_timer_clear_all(); 
   sexp ctx = ctx2;
  //sexp_gc_var3(cmd,arg_sym,arg_val); 
@@ -129,12 +135,15 @@ int ws_init(void) {
  //arg_sym=sexp_intern(ctx, "msg", -1); 
  //arg_val=sexp_c_string(ctx,msg.data,-1);
  //sexp_env_define(ctx, sexp_context_env(ctx), arg_sym, arg_val);
- sexp_eval_string(ctx, "(set-timer)", -1, NULL);
+// sexp_eval_string(ctx, "(set-timer)", -1, NULL);
 // sexp_gc_release3(ctx); 
    
+<<<<<<< HEAD
 =======
 =======
 >>>>>>> parent of c8c2b1c (big changes)
+=======
+>>>>>>> ddff3b9b4bd2df6f125279f8d1476863df4f17e4
 
   // fio_mark_time(); 
   // fio_timer_clear_all(); 
@@ -142,9 +151,12 @@ int ws_init(void) {
    // struct timespec start = fio_last_tick(); 
    fio_run_every(5000, 0, ws_on_timer1, NULL, NULL);
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> parent of c8c2b1c (big changes)
 =======
 >>>>>>> parent of c8c2b1c (big changes)
+=======
+>>>>>>> ddff3b9b4bd2df6f125279f8d1476863df4f17e4
   
 
 /////
@@ -176,13 +188,13 @@ static void on_http_request(http_s *h) {
 ///* HTTP upgrade callback */
 static void on_http_upgrade(http_s *h, char *requested_protocol, size_t len) {
 //  /* Upgrade to  WebSockets and set the request path as a nickname. */
-  FIOBJ nickname;
-  if (fiobj_obj2cstr(h->path).len > 1) {
-    nickname = fiobj_str_new(fiobj_obj2cstr(h->path).data + 1,
-                             fiobj_obj2cstr(h->path).len - 1);
-  } else {
-    nickname = fiobj_str_new("Guest", 5);
-  }
+  // FIOBJ nickname;
+  // if (fiobj_obj2cstr(h->path).len > 1) {
+  //   nickname = fiobj_str_new(fiobj_obj2cstr(h->path).data + 1,
+  //                            fiobj_obj2cstr(h->path).len - 1);
+  // } else {
+  //   nickname = fiobj_str_new("Guest", 5);
+  // }
  // /* Test for upgrade protocol (websocket) */
   if (len == 9 && requested_protocol[1] == 'e') {
     if (fio_cli_get_bool("-v")) {
@@ -199,7 +211,6 @@ static void on_http_upgrade(http_s *h, char *requested_protocol, size_t len) {
     fiobj_free(nickname); // we didn't use this
   }
 }
-
 ///* *****************************************************************************
 //Globals//
 //***************************************************************************** */
