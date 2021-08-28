@@ -31,9 +31,6 @@
 ;static void ws_on_shutdown(ws_s *ws);
 ;static void ws_on_close(intptr_t uuid, void *udata);
 ;static void ws_init(void);
-;fio_run_every(9000, 0, ws_on_timer1, NULL, NULL);
-;int fio_run_every(size_t milliseconds, size_t repetitions, void (*task)(void *),
-                  ;void *arg, void (*on_finish)(void *))
 ;(define-c-struct ws_s)
 (define-c-struct fio_str_info_s)
 (define-c int ws_init())
@@ -41,4 +38,3 @@
 (define-c int ws_close_client(int))
 (define-c void ws_on_message(sexp (struct fio_str_info_s) int))
 (define-c void ws_write(sexp string int int))
-(define-c int fio_run_every_wrap(size_t size_t string))

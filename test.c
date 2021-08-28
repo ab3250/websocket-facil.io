@@ -18,18 +18,6 @@ types: (fio_str_info_s)
 enums: ()
 */
 
-sexp sexp_fio_run_every_wrap_stub (sexp ctx, sexp self, sexp_sint_t n, sexp arg0, sexp arg1, sexp arg2) {
-  sexp res;
-  if (! sexp_exact_integerp(arg0))
-    return sexp_type_exception(ctx, self, SEXP_FIXNUM, arg0);
-  if (! sexp_exact_integerp(arg1))
-    return sexp_type_exception(ctx, self, SEXP_FIXNUM, arg1);
-  if (! sexp_stringp(arg2))
-    return sexp_type_exception(ctx, self, SEXP_STRING, arg2);
-  res = sexp_make_integer(ctx, fio_run_every_wrap(sexp_uint_value(arg0), sexp_uint_value(arg1), sexp_string_data(arg2)));
-  return res;
-}
-
 sexp sexp_ws_write_stub (sexp ctx, sexp self, sexp_sint_t n, sexp arg0, sexp arg1, sexp arg2, sexp arg3) {
   sexp res;
   if (! sexp_stringp(arg1))
@@ -88,13 +76,6 @@ sexp sexp_init_library (sexp ctx, sexp self, sexp_sint_t n, sexp env, const char
   sexp_fio_str_info_s_type_obj = sexp_register_c_type(ctx, name, sexp_finalize_c_type);
   tmp = sexp_string_to_symbol(ctx, name);
   sexp_env_define(ctx, env, tmp, sexp_fio_str_info_s_type_obj);
-  op = sexp_define_foreign(ctx, env, "fio_run_every_wrap", 3, sexp_fio_run_every_wrap_stub);
-  if (sexp_opcodep(op)) {
-    sexp_opcode_return_type(op) = sexp_make_fixnum(SEXP_FIXNUM);
-    sexp_opcode_arg1_type(op) = sexp_make_fixnum(SEXP_FIXNUM);
-    sexp_opcode_arg2_type(op) = sexp_make_fixnum(SEXP_FIXNUM);
-    sexp_opcode_arg3_type(op) = sexp_make_fixnum(SEXP_STRING);
-  }
   op = sexp_define_foreign(ctx, env, "ws_write", 4, sexp_ws_write_stub);
   if (sexp_opcodep(op)) {
     sexp_opcode_return_type(op) = SEXP_VOID;
