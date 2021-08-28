@@ -82,10 +82,13 @@
     (ws_write gblWs  "howdy2"  6  1))
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 (define (set-timer)
 (fio_run_every_wrap 9000 0 "timer1")
 )
 
+=======
+>>>>>>> parent of c8c2b1c (big changes)
 =======
 >>>>>>> parent of c8c2b1c (big changes)
 (define (ontimer1)

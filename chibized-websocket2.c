@@ -19,6 +19,7 @@ static void ws_on_close(intptr_t uuid, void *udata);
 static void ws_write(sexp ws, char *msg, int len, int is_text);
 static void ws_on_timer1(void);
 <<<<<<< HEAD
+<<<<<<< HEAD
 static int fio_run_every_wrap(size_t interval, size_t repeat, char * func);
 extern void fio_timer_clear_all(void);
 
@@ -62,6 +63,8 @@ static int fio_run_every_wrap(size_t interval, size_t repeat, char * func)
 
 
 }
+=======
+>>>>>>> parent of c8c2b1c (big changes)
 =======
 >>>>>>> parent of c8c2b1c (big changes)
 
@@ -115,6 +118,7 @@ int ws_init(void) {
     }
 /////
 <<<<<<< HEAD
+<<<<<<< HEAD
    //fio_timer_clear_all(); 
   sexp ctx = ctx2;
  //sexp_gc_var3(cmd,arg_sym,arg_val); 
@@ -129,12 +133,17 @@ int ws_init(void) {
 // sexp_gc_release3(ctx); 
    
 =======
+=======
+>>>>>>> parent of c8c2b1c (big changes)
 
   // fio_mark_time(); 
   // fio_timer_clear_all(); 
    struct timespec start = fio_last_tick(); 
    // struct timespec start = fio_last_tick(); 
    fio_run_every(5000, 0, ws_on_timer1, NULL, NULL);
+<<<<<<< HEAD
+>>>>>>> parent of c8c2b1c (big changes)
+=======
 >>>>>>> parent of c8c2b1c (big changes)
   
 
