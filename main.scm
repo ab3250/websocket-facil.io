@@ -45,7 +45,7 @@
 (define (func x end acc)
   (cons (if (< (- x 1)(/ end 2)) "0" "1" ) acc))
 
-(define deck2 (for-acc 1 5000 func))
+(define deck2 (for-acc 1 20000 func))
 
 (define deck (list "0000" "0001" "0002" "0003" "0004" "0005" "0006" "0007" "0008" "0009" "0010" "0011" "0012"
                    "0100" "0101" "0102" "0103" "0104" "0105" "0106" "0107" "0108" "0109" "0110" "0111" "0112"
@@ -59,8 +59,7 @@
 
 
 (define gblWs -1)
-(define port 8080)
-(define count 1)
+
 
 (define (delay sec)
     (define start (current-seconds))
@@ -73,17 +72,18 @@
      (when (not test) . body))))
 
 (define (onclose wsptr)
-    (display (list 'closed wsptr))
+    (display (list 'closed ))
     (newline)
-    (set! gblFd -1))
+    )
 
 (define (onopen wsptr)
     (set! gblWs wsptr)
     (ws_write gblWs  "howdy2"  6  1))
 
 (define (ontimer1)
-    (let ((len2 (string-length (json->string(knuth-shuffle deck2))))(len (string-length (json->string(knuth-shuffle deck)))))
-   ; (ws_write gblWs (json->string(knuth-shuffle deck2)) len2   1) 
+    (let ((len2 (string-length (json->string(knuth-shuffle deck2))))
+          (len (string-length (json->string(knuth-shuffle deck)))))
+    (ws_write gblWs (json->string(knuth-shuffle deck2)) len2   1) 
     (ws_write gblWs (json->string(knuth-shuffle deck)) len   1) 
     (set! count (+ count 1))))
 
