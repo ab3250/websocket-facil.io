@@ -45,6 +45,15 @@
 
 (define deck2 (for-acc 1 3200 func))
 
+;(define deck2string (list->string deck2))
+;(define deck2ff (string->list (map (lambda (x)(string x)) deck2string)))
+
+;(define deck2list (string->list  deck2string))
+
+;(convertToString (cons #\a (convertToString (cons #\b (convertToString (cons #\c '()))))))
+
+;(display deck2string)
+
 (define deck (list "0000" "0001" "0002" "0003" "0004" "0005" "0006" "0007" "0008" "0009" "0010" "0011" "0012"
                    "0100" "0101" "0102" "0103" "0104" "0105" "0106" "0107" "0108" "0109" "0110" "0111" "0112"
                    "0200" "0201" "0202" "0203" "0204" "0205" "0206" "0207" "0208" "0209" "0210" "0211" "0212"
@@ -69,9 +78,7 @@
 
 (define (onopen wsptr)
     (set! gblWs wsptr)
-    (ws_write gblWs  "howdy2"  6  1))
-
-
+    (ws_write gblWs  "howdy"  5  1))
 
 (define (ontimer1)
     (let ((len2 (string-length (json->string(knuth-shuffle deck2))))

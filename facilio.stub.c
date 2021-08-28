@@ -38,3 +38,39 @@
 (define-c int ws_close_client(int))
 (define-c void ws_on_message(sexp (struct fio_str_info_s) int))
 (define-c void ws_write(sexp string int int))
+
+
+(define-c-struct fio_str_info_s
+  finalizer: freeaddrinfo
+  predicate: address-info?
+  (int              ai_family    address-info-family)
+  (int              ai_socktype  address-info-socket-type)
+  (int              ai_protocol  address-info-protocol)
+  ((link sockaddr)  ai_addr      address-info-address)
+  (size_t           ai_addrlen   address-info-address-length)
+  ((link addrinfo)  ai_next      address-info-next))
+
+
+  (register-simple-type <name-string> <parent> <field-names>)
+ => <type>    ; parent may be #f, field-names should be a list of symbols
+
+(make-type-predicate <opcode-name-string> <type>)
+ => <opcode>  ; takes 1 arg, returns #t iff that arg is of the type
+
+(make-constructor <constructor-name-string> <type>)
+ => <opcode>  ; takes 0 args, returns a newly allocated instance of type
+
+(make-getter <getter-name-string> <type> <field-index>)
+ => <opcode>  ; takes 1 args, retrieves the field located at the index
+
+(make-setter <setter-name-string> <type> <field-index>)
+ => <opcode>  ; takes 2 args, sets the field located at the index
+
+(type-slot-offset <type> <field-name>)
+ => <index>   ; returns the index of the field with the given name
+
+ (define-c-struct struct_name
+  [predicate: predicate-name]
+  [constructor: constructor-name]
+  [finalizer: c_finalizer_name]
+  (type c_field_name getter-name setter-name) ...)
