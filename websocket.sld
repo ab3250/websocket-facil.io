@@ -7,5 +7,6 @@
     ws_init
     ws_close_client
     ws_write
+    fio_run_every_wrap
   )
 (include-shared "websocket"))

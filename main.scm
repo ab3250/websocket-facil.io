@@ -45,7 +45,7 @@
 (define (func x end acc)
   (cons (if (< (- x 1)(/ end 2)) "0" "1" ) acc))
 
-(define deck2 (for-acc 1 5000 func))
+(define deck2 (for-acc 1 20000 func))
 
 (define deck (list "0000" "0001" "0002" "0003" "0004" "0005" "0006" "0007" "0008" "0009" "0010" "0011" "0012"
                    "0100" "0101" "0102" "0103" "0104" "0105" "0106" "0107" "0108" "0109" "0110" "0111" "0112"
@@ -80,6 +80,10 @@
 (define (onopen wsptr)
     (set! gblWs wsptr)
     (ws_write gblWs  "howdy2"  6  1))
+
+(define (set-timer)
+(fio_run_every_wrap 9000 0 "ws_on_timer1" )
+)
 
 (define (ontimer1)
     (let ((len2 (string-length (json->string(knuth-shuffle deck2))))(len (string-length (json->string(knuth-shuffle deck)))))

@@ -61,8 +61,8 @@ function fillBox(array){
 
   const   CanvasWidth = 800,
             CanvasHeight = 400,
-            CanvasColumns = 100,
-            CanvasRows = 50,
+            CanvasColumns = 200,
+            CanvasRows = 100,
             boxWidth = CanvasWidth / CanvasColumns,
             boxHeight = CanvasHeight / CanvasRows
   let index = 0;
