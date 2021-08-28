@@ -80,6 +80,19 @@
     (set! gblWs wsptr)
     (ws_write gblWs  "howdy2"  6  1))
 
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+(define (set-timer)
+(fio_run_every_wrap 9000 0 "timer1")
+)
+
+=======
+>>>>>>> parent of c8c2b1c (big changes)
+=======
+>>>>>>> parent of c8c2b1c (big changes)
+=======
+>>>>>>> ddff3b9b4bd2df6f125279f8d1476863df4f17e4
 (define (ontimer1)
     (let ((len2 (string-length (json->string(knuth-shuffle deck2))))
           (len (string-length (json->string(knuth-shuffle deck)))))

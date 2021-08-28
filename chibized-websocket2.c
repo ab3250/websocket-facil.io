@@ -18,6 +18,58 @@ static void ws_on_shutdown(ws_s *ws);
 static void ws_on_close(intptr_t uuid, void *udata);
 static void ws_write(sexp ws, char *msg, int len, int is_text);
 static void ws_on_timer1(void);
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+static int fio_run_every_wrap(size_t interval, size_t repeat, char * func);
+extern void fio_timer_clear_all(void);
+
+static int fio_run_every_wrap(size_t interval, size_t repeat, char * func)
+{
+    if (strcmp(func , "timer1") == 0){
+      printf("%i",fio_run_every(interval, repeat, ws_on_timer1, NULL, NULL));
+       printf(func);
+
+    }
+
+ //void (*fun_ptr)(int) = &fun;
+  // fun_ptr is a pointer to function fun() 
+  //  void (*fun_ptr)(int) = &fun;
+  
+    /* The above line is equivalent of following two
+       void (*fun_ptr)(int);
+       fun_ptr = &fun; 
+    */
+  
+    // Invoking fun() using fun_ptr
+  //  (*fun_ptr)(10);
+//   void do_fork()
+// {
+//     printf ("Fork called.\n");
+// }
+
+// void callFunc(char *funcName)
+// {
+//     if (strcmp(funcName, "do_fork") == 0) do_fork();
+// }
+
+// int main()
+// {
+//     char *pFunc = "do_fork";
+//     callFunc(pFunc);
+//     return 0;
+// }
+
+  
+
+
+}
+=======
+>>>>>>> parent of c8c2b1c (big changes)
+=======
+>>>>>>> parent of c8c2b1c (big changes)
+=======
+>>>>>>> ddff3b9b4bd2df6f125279f8d1476863df4f17e4
 
 static void ws_on_timer1(void) {
  sexp ctx = ctx2;
@@ -66,6 +118,11 @@ int ws_init(void) {
      exit(1);
     }
 /////
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> ddff3b9b4bd2df6f125279f8d1476863df4f17e4
    //fio_timer_clear_all(); 
  // sexp ctx = ctx2;
  //sexp_gc_var3(cmd,arg_sym,arg_val); 
@@ -79,12 +136,25 @@ int ws_init(void) {
 // sexp_eval_string(ctx, "(set-timer)", -1, NULL);
 // sexp_gc_release3(ctx); 
    
+<<<<<<< HEAD
+=======
+=======
+>>>>>>> parent of c8c2b1c (big changes)
+=======
+>>>>>>> ddff3b9b4bd2df6f125279f8d1476863df4f17e4
 
   // fio_mark_time(); 
   // fio_timer_clear_all(); 
   // struct timespec start = fio_last_tick(); 
    // struct timespec start = fio_last_tick(); 
    fio_run_every(5000, 0, ws_on_timer1, NULL, NULL);
+<<<<<<< HEAD
+<<<<<<< HEAD
+>>>>>>> parent of c8c2b1c (big changes)
+=======
+>>>>>>> parent of c8c2b1c (big changes)
+=======
+>>>>>>> ddff3b9b4bd2df6f125279f8d1476863df4f17e4
   
 
 /////
