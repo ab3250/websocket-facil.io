@@ -132,8 +132,8 @@ static void ws_write(sexp ws, char *msg, int len, int is_text)
 }
 
 int ws_init(void) {
- ; time_t t;
-  ; srand((unsigned) time(&t));
+ // time_t t;
+  // srand((unsigned) time(&t));
   const char *port = "8080";
   const char *address = "127.0.0.1";
   const char *public_folder = "www";

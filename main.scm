@@ -63,10 +63,10 @@
 (define (func-string x end acc)
   (if (< (- x 1)(/ end 2)) (string-append "0" acc) (string-append "1" acc) ))
 
-(define deck2string (for-acc-str 1 80000 func-string))
+;(define deck2string (for-acc-str 1 28800 func-string))
 
-(define (string->list3 str)
-  (map (lambda(x)(string x)) (string->list deck2string)))
+;(define (string->list3 str)
+;  (map (lambda(x)(string x)) (string->list deck2string)))
 
 ;(define deck2 (for-acc-list 1 3200 func-list))
 
@@ -87,10 +87,8 @@
     ((unless test . body)
      (when (not test) . body))))
 
-(define (randomed retstr)
-  (ws_write gblWs (json->string (string->list3 retstr)) (string-length(json->string (string->list3 retstr)))   1) 
-     
-  )
+;(define (randomed retstr)
+;  (ws_write gblWs (json->string (string->list3 retstr)) (string-length(json->string (string->list3 retstr)))   1))
 
 (define (onclose wsptr)
     (display (list 'closed ))
@@ -106,7 +104,7 @@
           (len (string-length (json->string(knuth-shuffle deck)))))
     ;(ws_write gblWs (json->string(knuth-shuffle deck2)) len2   1) 
     (ws_write gblWs (json->string(knuth-shuffle deck)) len   1) 
-    (ws_send_str deck2string)  
+    ;(ws_send_str deck2string)  
     ))
 
 (define (onmessage msg)    
