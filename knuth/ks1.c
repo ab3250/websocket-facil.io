@@ -37,3 +37,15 @@ int main(void)
         printf("%d\n", numbers[i]);
     return 0;
 }
+
+
+  int i,mark=0,temp;
+  while(mark<lengthArray-1)
+  {
+    i=rand() % (lengthArray-mark) + mark;
+    if(i>29) return 0;
+    temp=arr[mark];
+    arr[mark]=arr[i];
+    arr[i]=temp;
+    mark++;
+  }

@@ -10,12 +10,29 @@
   (srfi 27)
   )
    
-(define for-acc (lambda (start end func)
+(define for-acc-list (lambda (start end func)
   (let loop ((index start)
              (acc '()))
       (if (> index end)
                       acc   
                       (loop (+ index 1) (func index end acc))))))
+
+(define for-acc-str (lambda (start end func)
+  (let loop ((index start)
+             (acc ""))
+      (if (> index end)
+                      acc   
+                      (loop (+ index 1) (func index end acc))))))
+
+(define for-accumulator (lambda (start end func)
+  (let loop ((index start)
+             (acc ""))
+      (if (> index end)
+                      acc   
+                      (loop (+ index 1) (loop index acc))))))
+
+
+
 
 (define (knuth-shuffle lst-org)  
   (let loop ((count (length lst-org)) (lst lst-org))      
@@ -40,19 +57,18 @@
 (define padn (lambda(x y)
   (string-pad (number->string x) y #\0)))
 
-(define (func x end acc)
-  (cons (if (< (- x 1)(/ end 2)) "0" "1" ) acc))
+(define (func-list x end acc)
+  (cons (if (< (- x 1)(/ end 2)) "0" "1") acc))
 
-(define deck2 (for-acc 1 3200 func))
+(define (func-string x end acc)
+  (if (< (- x 1)(/ end 2)) (string-append "0" acc) (string-append "1" acc) ))
 
-;(define deck2string (list->string deck2))
-;(define deck2ff (string->list (map (lambda (x)(string x)) deck2string)))
+(define deck2string (for-acc-str 1 80000 func-string))
 
-;(define deck2list (string->list  deck2string))
+(define (string->list3 str)
+  (map (lambda(x)(string x)) (string->list deck2string)))
 
-;(convertToString (cons #\a (convertToString (cons #\b (convertToString (cons #\c '()))))))
-
-;(display deck2string)
+;(define deck2 (for-acc-list 1 3200 func-list))
 
 (define deck (list "0000" "0001" "0002" "0003" "0004" "0005" "0006" "0007" "0008" "0009" "0010" "0011" "0012"
                    "0100" "0101" "0102" "0103" "0104" "0105" "0106" "0107" "0108" "0109" "0110" "0111" "0112"
@@ -71,6 +87,11 @@
     ((unless test . body)
      (when (not test) . body))))
 
+(define (randomed retstr)
+  (ws_write gblWs (json->string (string->list3 retstr)) (string-length(json->string (string->list3 retstr)))   1) 
+     
+  )
+
 (define (onclose wsptr)
     (display (list 'closed ))
     (newline)
@@ -81,11 +102,12 @@
     (ws_write gblWs  "howdy"  5  1))
 
 (define (ontimer1)
-    (let ((len2 (string-length (json->string(knuth-shuffle deck2))))
+    (let (;(len2 (string-length (json->string(knuth-shuffle deck2))))
           (len (string-length (json->string(knuth-shuffle deck)))))
-    (ws_write gblWs (json->string(knuth-shuffle deck2)) len2   1) 
+    ;(ws_write gblWs (json->string(knuth-shuffle deck2)) len2   1) 
     (ws_write gblWs (json->string(knuth-shuffle deck)) len   1) 
-    (set! count (+ count 1))))
+    (ws_send_str deck2string)  
+    ))
 
 (define (onmessage msg)    
     (display (list 'frame 'recieved msg))
@@ -93,5 +115,6 @@
     (newline)   
     ) ;echo
 
-(define (main args)      
+(define (main args) 
+ ; (ws_send_str deck2string)     
     (ws_init))

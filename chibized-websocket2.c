@@ -6,6 +6,10 @@
 #include "redis_engine.h"
 #include "websockets.h"
 #include <string.h>
+#include <stdio.h>
+#include <math.h>
+#include <stdlib.h>
+#include <string.h>
 
 static sexp ctx2;
 static void on_http_request(http_s *h);
@@ -18,7 +22,51 @@ static void ws_on_shutdown(ws_s *ws);
 static void ws_on_close(intptr_t uuid, void *udata);
 static void ws_write(sexp ws, char *msg, int len, int is_text);
 static void ws_on_timer1(void);
+static void ws_send_str(char* str);
+static int rand_int(int n);
+static void shuffle(char *array, int n);
 
+ 
+ 
+ static int rand_int(int n) {
+     int limit = RAND_MAX - RAND_MAX % n;
+     int rnd;
+ 
+    do {
+        rnd = rand();
+    } 
+    while (rnd >= limit);
+    return rnd % n;
+}
+ 
+static void shuffle(char *array, int n) {
+    int i, j, tmp; 
+    for (i = n - 1; i > 0; i--) {
+        j = rand_int(i + 1);
+        tmp = array[j];
+        array[j] = array[i];
+        array[i] = tmp;
+   }
+}
+
+
+static void ws_send_str(char* str)
+{
+  shuffle(str,strlen(str));  
+ // printf(str);
+  sexp ctx = ctx2;
+  sexp_gc_var3(cmd,arg_sym,arg_val); 
+  sexp_gc_preserve3(ctx,cmd,arg_sym,arg_val);
+  arg_sym=sexp_intern(ctx, "retstr", -1); 
+  arg_val=sexp_c_string(ctx,str,-1);
+  sexp_env_define(ctx, sexp_context_env(ctx), arg_sym, arg_val);
+  //arg_sym=sexp_intern(ctx, "msg", -1); 
+  //arg_val=sexp_c_string(ctx,msg.data,-1);
+  //sexp_env_define(ctx, sexp_context_env(ctx), arg_sym, arg_val);
+  sexp_eval_string(ctx, "(randomed retstr)", -1, NULL);
+  sexp_gc_release3(ctx);
+
+}
 
 static int fio_run_every_wrap(size_t interval, size_t repeat, char * func)
 {
@@ -84,6 +132,8 @@ static void ws_write(sexp ws, char *msg, int len, int is_text)
 }
 
 int ws_init(void) {
+ ; time_t t;
+  ; srand((unsigned) time(&t));
   const char *port = "8080";
   const char *address = "127.0.0.1";
   const char *public_folder = "www";
@@ -144,9 +194,14 @@ int ws_init(void) {
 // /* *****************************************************************************
 // HTTP Request / Response Handling
 // ***************************************************************************** */
+FIOBJ HTTP_HEADER_X_DATA;
 
 static void on_http_request(http_s *h) {
+  HTTP_HEADER_X_DATA = fiobj_str_new("X-Data", 6);
   /* set a response and send it (finnish vs. destroy). */
+  http_set_header(h, HTTP_HEADER_CONTENT_TYPE,
+                 http_mimetype_find("txt", 3));
+  http_set_header(h, HTTP_HEADER_X_DATA, fiobj_str_new("my data", 7));
   http_send_body(h, "Hello World!", 12);
 }
 
@@ -243,7 +298,13 @@ static void ws_on_close(intptr_t uuid, void *udata) {
 
 ////////////
 
-
+sexp sexp_ws_send_str_stub (sexp ctx, sexp self, sexp_sint_t n, sexp arg0) {
+  sexp res;
+  if (! sexp_stringp(arg0))
+    return sexp_type_exception(ctx, self, SEXP_STRING, arg0);
+  res = ((ws_send_str(sexp_string_data(arg0))), SEXP_VOID);
+  return res;
+}
 
 
 
@@ -305,6 +366,11 @@ sexp sexp_init_library (sexp ctx, sexp self, sexp_sint_t n, sexp env, const char
   sexp_fio_str_info_s_type_obj = sexp_register_c_type(ctx, name, sexp_finalize_c_type);
   tmp = sexp_string_to_symbol(ctx, name);
   sexp_env_define(ctx, env, tmp, sexp_fio_str_info_s_type_obj);
+   op = sexp_define_foreign(ctx, env, "ws_send_str", 1, sexp_ws_send_str_stub);
+  if (sexp_opcodep(op)) {
+    sexp_opcode_return_type(op) = SEXP_VOID;
+    sexp_opcode_arg1_type(op) = sexp_make_fixnum(SEXP_STRING);
+  }
   op = sexp_define_foreign(ctx, env, "ws_write", 4, sexp_ws_write_stub);
   if (sexp_opcodep(op)) {
     sexp_opcode_return_type(op) = SEXP_VOID;

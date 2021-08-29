@@ -18,6 +18,14 @@ types: (fio_str_info_s)
 enums: ()
 */
 
+sexp sexp_ws_send_str_stub (sexp ctx, sexp self, sexp_sint_t n, sexp arg0) {
+  sexp res;
+  if (! sexp_stringp(arg0))
+    return sexp_type_exception(ctx, self, SEXP_STRING, arg0);
+  res = ((ws_send_str(sexp_string_data(arg0))), SEXP_VOID);
+  return res;
+}
+
 sexp sexp_ws_write_stub (sexp ctx, sexp self, sexp_sint_t n, sexp arg0, sexp arg1, sexp arg2, sexp arg3) {
   sexp res;
   if (! sexp_stringp(arg1))
@@ -76,6 +84,11 @@ sexp sexp_init_library (sexp ctx, sexp self, sexp_sint_t n, sexp env, const char
   sexp_fio_str_info_s_type_obj = sexp_register_c_type(ctx, name, sexp_finalize_c_type);
   tmp = sexp_string_to_symbol(ctx, name);
   sexp_env_define(ctx, env, tmp, sexp_fio_str_info_s_type_obj);
+  op = sexp_define_foreign(ctx, env, "ws_send_str", 1, sexp_ws_send_str_stub);
+  if (sexp_opcodep(op)) {
+    sexp_opcode_return_type(op) = SEXP_VOID;
+    sexp_opcode_arg1_type(op) = sexp_make_fixnum(SEXP_STRING);
+  }
   op = sexp_define_foreign(ctx, env, "ws_write", 4, sexp_ws_write_stub);
   if (sexp_opcodep(op)) {
     sexp_opcode_return_type(op) = SEXP_VOID;
