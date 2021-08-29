@@ -26,7 +26,7 @@
 
 
 ;static void ws_on_open(ws_s *ws);
-
+;int fio_defer(void (*task)(void *, void *), void *udata1, void *udata2);
 ;static void ws_on_message(ws_s *ws, fio_str_info_s msg, uint8_t is_text);
 ;static void ws_on_shutdown(ws_s *ws);
 ;static void ws_on_close(intptr_t uuid, void *udata);

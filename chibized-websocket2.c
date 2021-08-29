@@ -26,6 +26,9 @@ static void ws_send_str(char* str);
 static int rand_int(int n);
 static void shuffle(char *array, int n);
 
+
+
+
  
  
  static int rand_int(int n) {
@@ -110,17 +113,8 @@ static int fio_run_every_wrap(size_t interval, size_t repeat, char * func)
 }
 
 static void ws_on_timer1(void) {
- sexp ctx = ctx2;
- //sexp_gc_var3(cmd,arg_sym,arg_val); 
- //sexp_gc_preserve3(ctx,cmd,arg_sym,arg_val);
- //arg_sym=sexp_intern(ctx, "wsptr", -1); 
- //arg_val=ws;
- //sexp_env_define(ctx, sexp_context_env(ctx), arg_sym, arg_val);
- //arg_sym=sexp_intern(ctx, "msg", -1); 
- //arg_val=sexp_c_string(ctx,msg.data,-1);
- //sexp_env_define(ctx, sexp_context_env(ctx), arg_sym, arg_val);
- sexp_eval_string(ctx, "(ontimer1)", -1, NULL);
- //sexp_gc_release3(ctx);
+ sexp ctx = ctx2; 
+ sexp_eval_string(ctx, "(ontimer1)", -1, NULL); 
 }
 
 static void ws_write(sexp ws, char *msg, int len, int is_text)
@@ -157,37 +151,13 @@ int ws_init(void) {
          "ERROR: facil.io couldn't initialize HTTP service (already running?)");
      exit(1);
     }
-/////
+
 
    //fio_timer_clear_all(); 
- // sexp ctx = ctx2;
- //sexp_gc_var3(cmd,arg_sym,arg_val); 
-// sexp_gc_preserve3(ctx,cmd,arg_sym,arg_val);
- //arg_sym=sexp_intern(ctx, "wsptr", -1); 
- //arg_val=ws;
- //sexp_env_define(ctx, sexp_context_env(ctx), arg_sym, arg_val);
- //arg_sym=sexp_intern(ctx, "msg", -1); 
- //arg_val=sexp_c_string(ctx,msg.data,-1);
- //sexp_env_define(ctx, sexp_context_env(ctx), arg_sym, arg_val);
-// sexp_eval_string(ctx, "(set-timer)", -1, NULL);
-// sexp_gc_release3(ctx); 
-   
-  // fio_mark_time(); 
-  // fio_timer_clear_all(); 
-  // struct timespec start = fio_last_tick(); 
-   // struct timespec start = fio_last_tick(); 
-   fio_run_every(5000, 0, ws_on_timer1, NULL, NULL);
-
-  
-
-/////
+   fio_run_every(5000, 1, ws_on_timer1, NULL, NULL);
+   //fio_defer(ws_on_timer1, NULL,NULL);
    fio_start(.threads = threads, .workers = workers);
-  // fio_cli_end();
-  // fio_tls_destroy(tls);
-//
- // struct timespec end = fio_last_tick(); 
-  //fio_timer_clear_all();
-   //
+   //fio_timer_clear_all();
    return(0);
   }
 
@@ -205,13 +175,11 @@ static void on_http_request(http_s *h) {
   http_send_body(h, "Hello World!", 12);
 }
 
-// /* *****************************************************************************
-// HTTP Upgrade Handling
-// ***************************************************************************** */
+ /* *****************************************************************************
+ HTTP Upgrade Handling
+ ***************************************************************************** */
 
-
-
-///* HTTP upgrade callback */
+/* HTTP upgrade callback */
 static void on_http_upgrade(http_s *h, char *requested_protocol, size_t len) {
  /* Upgrade to  WebSockets and set the request path as a nickname. */
   FIOBJ nickname;
@@ -237,11 +205,7 @@ static void on_http_upgrade(http_s *h, char *requested_protocol, size_t len) {
     fiobj_free(nickname); // we didn't use this
   }
 }
-///* *****************************************************************************
-//Globals//
-//***************************************************************************** */
 
-//static fio_str_info_s CHAT_CANNEL = {.data = "chat", .len = 4};
 
 
 ///* *****************************************************************************
@@ -292,11 +256,7 @@ static void ws_on_close(intptr_t uuid, void *udata) {
   //fiobj_free((FIOBJ)udata);
 //  (void)uuid; // we don't use the ID
 }
-////////////
 
-
-
-////////////
 
 sexp sexp_ws_send_str_stub (sexp ctx, sexp self, sexp_sint_t n, sexp arg0) {
   sexp res;
@@ -305,8 +265,6 @@ sexp sexp_ws_send_str_stub (sexp ctx, sexp self, sexp_sint_t n, sexp arg0) {
   res = ((ws_send_str(sexp_string_data(arg0))), SEXP_VOID);
   return res;
 }
-
-
 
 sexp sexp_ws_write_stub (sexp ctx, sexp self, sexp_sint_t n, sexp arg0, sexp arg1, sexp arg2, sexp arg3) {
   sexp res;

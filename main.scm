@@ -31,9 +31,6 @@
                       acc   
                       (loop (+ index 1) (loop index acc))))))
 
-
-
-
 (define (knuth-shuffle lst-org)  
   (let loop ((count (length lst-org)) (lst lst-org))      
     (if (zero? count)
@@ -88,7 +85,7 @@
      (when (not test) . body))))
 
 ;(define (randomed retstr)
-;  (ws_write gblWs (json->string (string->list3 retstr)) (string-length(json->string (string->list3 retstr)))   1))
+  ;(ws_write gblWs (json->string (string->list3 retstr)) (string-length(json->string (string->list3 retstr)))   1))
 
 (define (onclose wsptr)
     (display (list 'closed ))
@@ -100,12 +97,16 @@
     (ws_write gblWs  "howdy"  5  1))
 
 (define (ontimer1)
+(let mainloop((count 5))
     (let (;(len2 (string-length (json->string(knuth-shuffle deck2))))
           (len (string-length (json->string(knuth-shuffle deck)))))
     ;(ws_write gblWs (json->string(knuth-shuffle deck2)) len2   1) 
     (ws_write gblWs (json->string(knuth-shuffle deck)) len   1) 
     ;(ws_send_str deck2string)  
-    ))
+    (delay 1)
+    (if (not(equal? 0 count))(mainloop (- count 1)))
+    
+    )))
 
 (define (onmessage msg)    
     (display (list 'frame 'recieved msg))
