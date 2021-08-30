@@ -22,94 +22,58 @@ static void ws_on_shutdown(ws_s *ws);
 static void ws_on_close(intptr_t uuid, void *udata);
 static void ws_write(sexp ws, char *msg, int len, int is_text);
 static void ws_on_timer1(void);
+static void ws_on_timer2(void);
 static void ws_send_str(char* str);
 static int rand_int(int n);
 static void shuffle(char *array, int n);
-
-
-
-
+static void initialize_timers(void);
  
- 
- static int rand_int(int n) {
-     int limit = RAND_MAX - RAND_MAX % n;
-     int rnd;
- 
-    do {
-        rnd = rand();
-    } 
-    while (rnd >= limit);
-    return rnd % n;
+static int rand_int(int n) {
+  int limit = RAND_MAX - RAND_MAX % n;
+  int rnd;
+  do {
+    rnd = rand();
+  } 
+  while (rnd >= limit);
+  return rnd % n;
 }
  
 static void shuffle(char *array, int n) {
-    int i, j, tmp; 
-    for (i = n - 1; i > 0; i--) {
-        j = rand_int(i + 1);
-        tmp = array[j];
-        array[j] = array[i];
-        array[i] = tmp;
-   }
+  int i, j, tmp; 
+  for (i = n - 1; i > 0; i--) {
+    j = rand_int(i + 1);
+    tmp = array[j];
+    array[j] = array[i];
+    array[i] = tmp;
+  }
 }
 
-
-static void ws_send_str(char* str)
-{
+static void ws_send_str(char* str) {
   shuffle(str,strlen(str));  
- // printf(str);
   sexp ctx = ctx2;
   sexp_gc_var3(cmd,arg_sym,arg_val); 
   sexp_gc_preserve3(ctx,cmd,arg_sym,arg_val);
   arg_sym=sexp_intern(ctx, "retstr", -1); 
   arg_val=sexp_c_string(ctx,str,-1);
   sexp_env_define(ctx, sexp_context_env(ctx), arg_sym, arg_val);
-  //arg_sym=sexp_intern(ctx, "msg", -1); 
-  //arg_val=sexp_c_string(ctx,msg.data,-1);
-  //sexp_env_define(ctx, sexp_context_env(ctx), arg_sym, arg_val);
   sexp_eval_string(ctx, "(randomed retstr)", -1, NULL);
   sexp_gc_release3(ctx);
-
 }
 
-static int fio_run_every_wrap(size_t interval, size_t repeat, char * func)
-{
-    if (strcmp(func , "timer1") == 0){
-      printf("%i",fio_run_every(interval, repeat, ws_on_timer1, NULL, NULL));
-       printf(func);
+static void initialize_timers(void) {
+  sexp ctx = ctx2;
+  sexp_eval_string(ctx, "(init-timers)", -1, NULL);
+}
 
-    }
-
- //void (*fun_ptr)(int) = &fun;
-  // fun_ptr is a pointer to function fun() 
-  //  void (*fun_ptr)(int) = &fun;
-  
-    /* The above line is equivalent of following two
-       void (*fun_ptr)(int);
-       fun_ptr = &fun; 
-    */
-  
-    // Invoking fun() using fun_ptr
-  //  (*fun_ptr)(10);
-//   void do_fork()
-// {
-//     printf ("Fork called.\n");
-// }
-
-// void callFunc(char *funcName)
-// {
-//     if (strcmp(funcName, "do_fork") == 0) do_fork();
-// }
-
-// int main()
-// {
-//     char *pFunc = "do_fork";
-//     callFunc(pFunc);
-//     return 0;
-// }
-
-  
-
-
+static int fio_run_every_wrap(size_t interval, size_t repeat, char * func) {
+  if (strcmp(func , "timer1") == 0){
+    printf("%i",fio_run_every(interval, repeat, ws_on_timer1, NULL, NULL));
+    printf(func);
+  }
+  else if (strcmp(func , "timer2") == 0){
+    printf("%i",fio_run_every(interval, repeat, ws_on_timer2, NULL, NULL));
+    printf(func);
+  }
 }
 
 static void ws_on_timer1(void) {
@@ -117,49 +81,46 @@ static void ws_on_timer1(void) {
  sexp_eval_string(ctx, "(ontimer1)", -1, NULL); 
 }
 
-static void ws_write(sexp ws, char *msg, int len, int is_text)
-{  
+static void ws_on_timer2(void) {
+ sexp ctx = ctx2; 
+ sexp_eval_string(ctx, "(ontimer2)", -1, NULL); 
+}
+
+static void ws_write(sexp ws, char *msg, int len, int is_text) {  
   fio_str_info_s e;
   e.data = msg;
   e.len = len;
   int ret = websocket_write((ws_s *)ws, (fio_str_info_s)e, is_text);
 }
 
-int ws_init(void) {
- // time_t t;
-  // srand((unsigned) time(&t));
+static int ws_init(void) {
   const char *port = "8080";
   const char *address = "127.0.0.1";
   const char *public_folder = "www";
   uint32_t threads = 1;
   uint32_t workers = 1;
   uint8_t print_log = 0; 
- //fio_tls_s *tls = NULL;
   setbuf(stdout, NULL);
- if (http_listen(port, address,
-                  .on_request = on_http_request,
-                  .on_upgrade = on_http_upgrade,
-                  .max_body_size = 1 * 1024 * 1024,
-                  .ws_max_msg_size = 1 * 1024,
-                  .public_folder = public_folder,
-                  .log = 0,
-                  .timeout = 10,
-         //        .tls = tls,
-                  .ws_timeout = 0) == -1) {
-  //  /* listen failed ?*/
-     perror(
-         "ERROR: facil.io couldn't initialize HTTP service (already running?)");
+  if (http_listen(port, address,
+    .on_request = on_http_request,
+    .on_upgrade = on_http_upgrade,
+    .max_body_size = 1 * 1024 * 1024,
+    .ws_max_msg_size = 1 * 1024,
+    .public_folder = public_folder,
+    .log = 0,
+    .timeout = 10,
+    .ws_timeout = 0) == -1) {
+    /* listen failed ? */
+     perror("ERROR: facil. io couldn't initialize HTTP service (already running?)");
      exit(1);
     }
-
-
-   //fio_timer_clear_all(); 
-   fio_run_every(5000, 1, ws_on_timer1, NULL, NULL);
-   //fio_defer(ws_on_timer1, NULL,NULL);
-   fio_start(.threads = threads, .workers = workers);
-   //fio_timer_clear_all();
-   return(0);
-  }
+  //fio_timer_clear_all(); 
+  fio_run_every(500, 1, initialize_timers, NULL, NULL);
+  //fio_defer(ws_on_timer1, NULL,NULL);
+  fio_start(.threads = threads, .workers = workers);
+  //fio_timer_clear_all();
+  return(0);
+ }
 
 // /* *****************************************************************************
 // HTTP Request / Response Handling
@@ -257,6 +218,17 @@ static void ws_on_close(intptr_t uuid, void *udata) {
 //  (void)uuid; // we don't use the ID
 }
 
+sexp sexp_fio_run_every_wrap_stub (sexp ctx, sexp self, sexp_sint_t n, sexp arg0, sexp arg1, sexp arg2) {
+  sexp res;
+  if (! sexp_exact_integerp(arg0))
+    return sexp_type_exception(ctx, self, SEXP_FIXNUM, arg0);
+  if (! sexp_exact_integerp(arg1))
+    return sexp_type_exception(ctx, self, SEXP_FIXNUM, arg1);
+  if (! sexp_stringp(arg2))
+    return sexp_type_exception(ctx, self, SEXP_STRING, arg2);
+  res = sexp_make_integer(ctx, fio_run_every_wrap(sexp_sint_value(arg0), sexp_sint_value(arg1), sexp_string_data(arg2)));
+  return res;
+}
 
 sexp sexp_ws_send_str_stub (sexp ctx, sexp self, sexp_sint_t n, sexp arg0) {
   sexp res;
@@ -312,7 +284,6 @@ sexp sexp_ws_init_stub (sexp ctx, sexp self, sexp_sint_t n) {
   return res;
 }
 
-
 sexp sexp_init_library (sexp ctx, sexp self, sexp_sint_t n, sexp env, const char* version, const sexp_abi_identifier_t abi) {
   sexp sexp_fio_str_info_s_type_obj;
   sexp_gc_var3(name, tmp, op);
@@ -324,6 +295,13 @@ sexp sexp_init_library (sexp ctx, sexp self, sexp_sint_t n, sexp env, const char
   sexp_fio_str_info_s_type_obj = sexp_register_c_type(ctx, name, sexp_finalize_c_type);
   tmp = sexp_string_to_symbol(ctx, name);
   sexp_env_define(ctx, env, tmp, sexp_fio_str_info_s_type_obj);
+  op = sexp_define_foreign(ctx, env, "fio_run_every_wrap", 3, sexp_fio_run_every_wrap_stub);
+  if (sexp_opcodep(op)) {
+    sexp_opcode_return_type(op) = sexp_make_fixnum(SEXP_FIXNUM);
+    sexp_opcode_arg1_type(op) = sexp_make_fixnum(SEXP_FIXNUM);
+    sexp_opcode_arg2_type(op) = sexp_make_fixnum(SEXP_FIXNUM);
+    sexp_opcode_arg3_type(op) = sexp_make_fixnum(SEXP_STRING);
+  }
    op = sexp_define_foreign(ctx, env, "ws_send_str", 1, sexp_ws_send_str_stub);
   if (sexp_opcodep(op)) {
     sexp_opcode_return_type(op) = SEXP_VOID;

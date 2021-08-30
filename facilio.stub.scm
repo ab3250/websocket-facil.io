@@ -39,6 +39,7 @@
 (define-c void ws_on_message(sexp (struct fio_str_info_s) int))
 (define-c void ws_write(sexp string int int))
 (define-c void ws_send_str(string))
+(define-c int fio_run_every_wrap(int int string))
 
 
 ; (define-c-struct fio_str_info_s

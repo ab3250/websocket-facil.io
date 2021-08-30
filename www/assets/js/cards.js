@@ -5,7 +5,7 @@ let ctx
  console.log("initialized websocket")
 
  ws.onmessage = function(evt) {
-     const d = JSON.parse(evt.data)
+    const d = JSON.parse(evt.data)
     d.length < 200 ? displayDeck(d) : fillBox(d)
  }
 
@@ -61,8 +61,8 @@ function fillBox(array){
 
   const   CanvasWidth = 800,
             CanvasHeight = 400,
-            CanvasColumns = 240,
-            CanvasRows = 120,
+            CanvasColumns = 100,
+            CanvasRows = 50,
             boxWidth = CanvasWidth / CanvasColumns,
             boxHeight = CanvasHeight / CanvasRows
   let index = 0;
