@@ -5,7 +5,7 @@ let ctx
  console.log("initialized websocket")
 
  ws.onmessage = function(evt) {
-    const d = JSON.parse(evt.data)
+  const d = JSON.parse(evt.data)    
     d.length < 200 ? displayDeck(d) : fillBox(d)
  }
 

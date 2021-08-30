@@ -9,7 +9,24 @@
   (srfi 1)
   (srfi 27)
   )
-   
+   ; test if eq?
+; (define ==
+;   (lambda (x y)
+;     (if (and (string? x) (string? y))
+;       (== x y)
+;       (if (or (string? x) (string? y))
+;             (= 1 0) ;return false
+;             (equal? x y)))))
+; ; (define a "aString")
+; (define l '("aString" "aOtherString"))
+; (== (car l) a) ; true
+; (== 1 1) ; true
+; (== 1 0) ; false
+; (== "a" 1) ; false diff. type
+; (== "a" "b") ; false
+; (== "a" "a") ; true
+; (== '("a" "b") '("a" "b"))
+
 ; (define for-acc-list (lambda (start end func)
 ;   (let loop ((index start)
 ;              (acc '()))
@@ -95,8 +112,8 @@
 
 (define (onopen wsptr)
     (set! gblWs wsptr)
-   ; (ws_write gblWs  "howdy"  5  1)
-   )
+    (ws_write gblWs  (json->string "{howdy}")  (string-length (json->string "{howdy}")) 1))
+   
 
 (define (ontimer1)
     (let ((len (string-length (json->string(knuth-shuffle deck)))))
@@ -108,13 +125,10 @@
 (define (onmessage msg)
     (cond 
       ((string=? msg "button1")(ws_write gblWs (json->string deck) (string-length (json->string deck)) 1))
-      ((string=? msg "button2")(ws_write gblWs (json->string deck2) (string-length (json->string deck2)) 1))
-      ((string=? msg "button3")(display msg));(ws_send_str deck2string))
-      ((string=? msg "button4")(ws_write gblWs (json->string(knuth-shuffle deck)) (string-length (json->string(knuth-shuffle deck))) 1))
-    )  )      
-    ;(ws_write gblWs  msg  7  1)
-   ; )
-
+      ((string=? msg "button2")(ws_write gblWs (json->string(knuth-shuffle deck))(string-length (json->string deck)) 1))
+      ((string=? msg "button3")(ws_write gblWs (json->string deck2) (string-length (json->string deck2)) 1))
+      ((string=? msg "button4")(ws_send_str deck2string))))      
+    
 (define (init-timers)
  ; (fio_run_every_wrap 6000 0 "timer1")
   (delay 3)

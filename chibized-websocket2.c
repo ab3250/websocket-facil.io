@@ -9,7 +9,7 @@
 #include <stdio.h>
 #include <math.h>
 #include <stdlib.h>
-#include <string.h>
+
 
 static sexp ctx2;
 static void on_http_request(http_s *h);
@@ -65,7 +65,7 @@ static void initialize_timers(void) {
   sexp_eval_string(ctx, "(init-timers)", -1, NULL);
 }
 
-static int fio_run_every_wrap(size_t interval, size_t repeat, char * func) {
+static int fio_run_every_wrap(size_t interval, size_t repeat, char *func) {
   if (strcmp(func , "timer1") == 0){
     printf("%i",fio_run_every(interval, repeat, ws_on_timer1, NULL, NULL));
     printf(func);
@@ -88,9 +88,9 @@ static void ws_on_timer2(void) {
 
 static void ws_write(sexp ws, char *msg, int len, int is_text) {  
   fio_str_info_s e;
-  e.data = msg;
+  e.data = msg;  
   e.len = len;
-  int ret = websocket_write((ws_s *)ws, (fio_str_info_s)e, is_text);
+  int ret = websocket_write((ws_s *)ws, e, is_text);
 }
 
 static int ws_init(void) {
@@ -175,6 +175,7 @@ static void on_http_upgrade(http_s *h, char *requested_protocol, size_t len) {
 
 static void ws_on_message(ws_s *ws, fio_str_info_s msg, uint8_t is_text) {
  sexp ctx = ctx2;
+ msg.data[7]=NULL;
  sexp_gc_var3(cmd,arg_sym,arg_val); 
  sexp_gc_preserve3(ctx,cmd,arg_sym,arg_val);
  //arg_sym=sexp_intern(ctx, "wsptr", -1); 
