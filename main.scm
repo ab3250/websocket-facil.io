@@ -13,16 +13,6 @@
 
 (define gblWs -1)
 
-(define (delay sec)
-    (define start (current-seconds))
-    (let timeloop ()    
-        (if ( < (- (current-seconds) start) sec) (timeloop))))
-
-(define-syntax unless
-  (syntax-rules ()
-    ((unless test . body)
-     (when (not test) . body))))
-
 (define (randomed retstr)
   (ws_write gblWs (json->string (string->list3 retstr)) (string-length(json->string (string->list3 retstr)))   1))
 
