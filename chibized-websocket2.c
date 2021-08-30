@@ -175,7 +175,8 @@ static void on_http_upgrade(http_s *h, char *requested_protocol, size_t len) {
 
 static void ws_on_message(ws_s *ws, fio_str_info_s msg, uint8_t is_text) {
  sexp ctx = ctx2;
- msg.data[7]=NULL;
+ msg.len--
+ msg.data[len]=NULL;
  sexp_gc_var3(cmd,arg_sym,arg_val); 
  sexp_gc_preserve3(ctx,cmd,arg_sym,arg_val);
  //arg_sym=sexp_intern(ctx, "wsptr", -1); 
