@@ -10,53 +10,6 @@
   (srfi 27)
   (wslib)
   )
- 
-; (define for-acc-str (lambda (start end func)
-;   (let loop ((index start)
-;              (acc ""))
-;       (if (> index end)
-;                       acc   
-;                       (loop (+ index 1) (func index end acc))))))
-
-; (define for-accumulator (lambda (start end acc-initial func )
-;   (let loop ((index start)
-;              (acc acc-initial))
-;       (if (> index end)
-;                       acc   
-;                       (loop (+ index 1) (func index end acc))))))
-
-; (define (knuth-shuffle lst-org)  
-;   (let loop ((count (length lst-org)) (lst lst-org))      
-;     (if (zero? count)
-;     	lst
-; 	(let*   ((j (random-integer count))
-; 		 (new-count (- count 1))
-; 	         (tmp (list-ref lst new-count))
-; 	         (lst2 (list-set lst new-count (list-ref lst j)))
-; 	         (lst3 (list-set lst2 j tmp)))	         
-; 	         (loop new-count lst3)))))
-
-; (define (list-set lst idx val)
-;   (if (null? lst)
-;     lst
-;     (cons
-;       (if (zero? idx)
-;         val
-;         (car lst))
-;       (list-set (cdr lst) (- idx 1) val))))
-
-; (define padn (lambda(x y)
-;   (string-pad (number->string x) y #\0)))
-
-; (define (func-list x end acc)
-;   (cons (if (< (- x 1)(/ end 2)) "0" "1") acc))
-
-; (define (func-string index end acc)
-;   (if (< (- index 1)(/ end 2)) (string-append "0" acc) (string-append "1" acc) ))
-
-; ;(define deck2string (for-acc-str 1 320000 func-string))
-
-
 
 (define gblWs -1)
 
