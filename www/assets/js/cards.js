@@ -6,8 +6,15 @@ let ctx
 
  ws.onmessage = function(evt) {
   const d = JSON.parse(evt.data) 
-    
-    d.data.length < 200 ? displayDeck(d.data) : fillBox(d.data)
+  switch (d.type){
+    case 'greeting': console.log(d.data) 
+                    break
+    case 'cards': displayDeck(d.data)
+                  break
+    case 'dots': fillBox(d.data)
+                  break
+    default: 
+  }
  }
 
  ws.onopen = function() {

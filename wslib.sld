@@ -9,19 +9,16 @@
   string->list3 
   deck2string 
   deck2
-  deck)
+  deck
+  jsonify)
  (import
   (scheme base)
   (only (srfi 130) string-pad)
-  (srfi 27))
+  (srfi 27)
+  (schemepunk json))
 
 (begin
-  ; (define for-acc (lambda (start end func)
-  ;   (let loop ((index start)
-  ;             (acc '()))
-  ;       (if (> index end)
-  ;                       acc   
-  ;                       (loop (+ index 1) (func index end acc))))))
+
   (define for-accumulator (lambda (start end acc-initial func )
     (let loop ((index start)
               (acc acc-initial))
@@ -64,6 +61,9 @@
 
   (define padn (lambda (x y)
     (string-pad (number->string x) y #\0)))
+  
+  (define jsonify (lambda (type data)
+    (string-append "{\"type\": \"" type "\",\"data\":" (json->string data) "}")))
 
   (define deck2 (for-accumulator 1 5000 '() func-list))
 
@@ -71,6 +71,4 @@
                     "0100" "0101" "0102" "0103" "0104" "0105" "0106" "0107" "0108" "0109" "0110" "0111" "0112"
                     "0200" "0201" "0202" "0203" "0204" "0205" "0206" "0207" "0208" "0209" "0210" "0211" "0212"
                     "0300" "0301" "0302" "0303" "0304" "0305" "0306" "0307" "0308" "0309" "0310" "0311" "0312"))
-  
-
 ))
