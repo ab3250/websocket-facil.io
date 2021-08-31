@@ -16,12 +16,12 @@
   (srfi 27))
 
 (begin
-  (define for-acc (lambda (start end func)
-    (let loop ((index start)
-              (acc '()))
-        (if (> index end)
-                        acc   
-                        (loop (+ index 1) (func index end acc))))))
+  ; (define for-acc (lambda (start end func)
+  ;   (let loop ((index start)
+  ;             (acc '()))
+  ;       (if (> index end)
+  ;                       acc   
+  ;                       (loop (+ index 1) (func index end acc))))))
   (define for-accumulator (lambda (start end acc-initial func )
     (let loop ((index start)
               (acc acc-initial))
@@ -49,8 +49,8 @@
           (car lst))
         (list-set (cdr lst) (- idx 1) val))))
 
-  (define func-list (lambda (x end acc)
-    (cons (if (< (- x 1)(/ end 2)) "0" "1") acc)))
+  (define func-list (lambda (index end acc)
+    (cons (if (< (- index 1)(/ end 2)) "0" "1") acc)))
 
   (define func-string (lambda (index end acc)
     (if (< (- index 1)(/ end 2)) 
@@ -67,7 +67,10 @@
 
   (define deck2 (for-accumulator 1 5000 '() func-list))
 
-  (define deck (list "0000" "0001" "0002" "0003" "0004" "0005" "0006" "0007" "0008" "0009" "0010" "0011" "0012"
+  (define deck    '("0000" "0001" "0002" "0003" "0004" "0005" "0006" "0007" "0008" "0009" "0010" "0011" "0012"
                     "0100" "0101" "0102" "0103" "0104" "0105" "0106" "0107" "0108" "0109" "0110" "0111" "0112"
                     "0200" "0201" "0202" "0203" "0204" "0205" "0206" "0207" "0208" "0209" "0210" "0211" "0212"
-                    "0300" "0301" "0302" "0303" "0304" "0305" "0306" "0307" "0308" "0309" "0310" "0311" "0312"))))
+                    "0300" "0301" "0302" "0303" "0304" "0305" "0306" "0307" "0308" "0309" "0310" "0311" "0312"))
+  
+
+))
