@@ -38,15 +38,13 @@ sexp sexp_ws_send_str_stub (sexp ctx, sexp self, sexp_sint_t n, sexp arg0) {
   return res;
 }
 
-sexp sexp_ws_write_stub (sexp ctx, sexp self, sexp_sint_t n, sexp arg0, sexp arg1, sexp arg2, sexp arg3) {
+sexp sexp_ws_write_stub (sexp ctx, sexp self, sexp_sint_t n, sexp arg0, sexp arg1, sexp arg2) {
   sexp res;
   if (! sexp_stringp(arg1))
     return sexp_type_exception(ctx, self, SEXP_STRING, arg1);
   if (! sexp_exact_integerp(arg2))
     return sexp_type_exception(ctx, self, SEXP_FIXNUM, arg2);
-  if (! sexp_exact_integerp(arg3))
-    return sexp_type_exception(ctx, self, SEXP_FIXNUM, arg3);
-  res = ((ws_write(arg0, sexp_string_data(arg1), sexp_sint_value(arg2), sexp_sint_value(arg3))), SEXP_VOID);
+  res = ((ws_write(arg0, sexp_string_data(arg1), sexp_sint_value(arg2))), SEXP_VOID);
   return res;
 }
 
@@ -108,13 +106,11 @@ sexp sexp_init_library (sexp ctx, sexp self, sexp_sint_t n, sexp env, const char
     sexp_opcode_return_type(op) = SEXP_VOID;
     sexp_opcode_arg1_type(op) = sexp_make_fixnum(SEXP_STRING);
   }
-  op = sexp_define_foreign(ctx, env, "ws_write", 4, sexp_ws_write_stub);
+  op = sexp_define_foreign(ctx, env, "ws_write", 3, sexp_ws_write_stub);
   if (sexp_opcodep(op)) {
     sexp_opcode_return_type(op) = SEXP_VOID;
     sexp_opcode_arg2_type(op) = sexp_make_fixnum(SEXP_STRING);
     sexp_opcode_arg3_type(op) = sexp_make_fixnum(SEXP_FIXNUM);
-    sexp_opcode_argn_type(op) = sexp_make_vector(ctx, SEXP_ONE, sexp_make_fixnum(SEXP_OBJECT));
-    sexp_vector_set(sexp_opcode_argn_type(op), SEXP_ZERO, sexp_make_fixnum(SEXP_FIXNUM));
   }
   op = sexp_define_foreign(ctx, env, "ws_on_message", 3, sexp_ws_on_message_stub);
   if (sexp_opcodep(op)) {

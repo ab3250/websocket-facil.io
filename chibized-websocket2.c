@@ -20,7 +20,7 @@ static void ws_on_open(ws_s *ws);
 static void ws_on_message(ws_s *ws, fio_str_info_s msg, uint8_t is_text);
 static void ws_on_shutdown(ws_s *ws);
 static void ws_on_close(intptr_t uuid, void *udata);
-static void ws_write(sexp ws, char *msg, int len, int is_text);
+static void ws_write(sexp ws, char *msg, int is_text);
 static void ws_on_timer1(void);
 static void ws_on_timer2(void);
 static void ws_send_str(char* str);
@@ -67,13 +67,12 @@ static void initialize_timers(void) {
 
 static int fio_run_every_wrap(size_t interval, size_t repeat, char *func) {
   if (strcmp(func , "timer1") == 0){
-    printf("%i",fio_run_every(interval, repeat, ws_on_timer1, NULL, NULL));
-    printf(func);
+    fio_run_every(interval, repeat, ws_on_timer1, NULL, NULL);
   }
   else if (strcmp(func , "timer2") == 0){
-    printf("%i",fio_run_every(interval, repeat, ws_on_timer2, NULL, NULL));
-    printf(func);
+    fio_run_every(interval, repeat, ws_on_timer2, NULL, NULL);
   }
+  return(0);
 }
 
 static void ws_on_timer1(void) {
@@ -86,11 +85,11 @@ static void ws_on_timer2(void) {
  sexp_eval_string(ctx, "(ontimer2)", -1, NULL); 
 }
 
-static void ws_write(sexp ws, char *msg, int len, int is_text) {  
+static void ws_write(sexp ws, char *msg, int is_text) {  
   fio_str_info_s e;
   e.data = msg;  
-  e.len = len;
-  int ret = websocket_write((ws_s *)ws, e, is_text);
+  e.len = strlen(msg);
+  websocket_write((ws_s *)ws, e, is_text);
 }
 
 static int ws_init(void) {
@@ -99,7 +98,7 @@ static int ws_init(void) {
   const char *public_folder = "www";
   uint32_t threads = 1;
   uint32_t workers = 1;
-  uint8_t print_log = 0; 
+ // uint8_t print_log = 0; 
   setbuf(stdout, NULL);
   if (http_listen(port, address,
     .on_request = on_http_request,
@@ -115,9 +114,13 @@ static int ws_init(void) {
      exit(1);
     }
   //fio_timer_clear_all(); 
-  fio_run_every(500, 1, initialize_timers, NULL, NULL);
-  //fio_defer(ws_on_timer1, NULL,NULL);
+ 
+  fio_run_every(1000, 1, initialize_timers, NULL, NULL);
+  
   fio_start(.threads = threads, .workers = workers);
+
+
+  //fio_defer(ws_on_timer1, NULL,NULL);
   //fio_timer_clear_all();
   return(0);
  }
@@ -175,8 +178,8 @@ static void on_http_upgrade(http_s *h, char *requested_protocol, size_t len) {
 
 static void ws_on_message(ws_s *ws, fio_str_info_s msg, uint8_t is_text) {
  sexp ctx = ctx2;
- msg.len--
- msg.data[len]=NULL;
+ msg.data[msg.len--]=NULL;
+ 
  sexp_gc_var3(cmd,arg_sym,arg_val); 
  sexp_gc_preserve3(ctx,cmd,arg_sym,arg_val);
  //arg_sym=sexp_intern(ctx, "wsptr", -1); 
@@ -240,18 +243,15 @@ sexp sexp_ws_send_str_stub (sexp ctx, sexp self, sexp_sint_t n, sexp arg0) {
   return res;
 }
 
-sexp sexp_ws_write_stub (sexp ctx, sexp self, sexp_sint_t n, sexp arg0, sexp arg1, sexp arg2, sexp arg3) {
+sexp sexp_ws_write_stub (sexp ctx, sexp self, sexp_sint_t n, sexp arg0, sexp arg1, sexp arg2) {
   sexp res;
   if (! sexp_stringp(arg1))
     return sexp_type_exception(ctx, self, SEXP_STRING, arg1);
   if (! sexp_exact_integerp(arg2))
     return sexp_type_exception(ctx, self, SEXP_FIXNUM, arg2);
-  if (! sexp_exact_integerp(arg3))
-    return sexp_type_exception(ctx, self, SEXP_FIXNUM, arg3);
-  res = ((ws_write(arg0, sexp_string_data(arg1), sexp_sint_value(arg2), sexp_sint_value(arg3))), SEXP_VOID);
+  res = ((ws_write(arg0, sexp_string_data(arg1), sexp_sint_value(arg2))), SEXP_VOID);
   return res;
 }
-
 sexp sexp_ws_on_message_stub (sexp ctx, sexp self, sexp_sint_t n, sexp arg0, sexp arg1, sexp arg2) {
   sexp res;
   if (! (sexp_pointerp(arg1) && (sexp_pointer_tag(arg1) == sexp_unbox_fixnum(sexp_opcode_arg2_type(self)))))
@@ -309,13 +309,11 @@ sexp sexp_init_library (sexp ctx, sexp self, sexp_sint_t n, sexp env, const char
     sexp_opcode_return_type(op) = SEXP_VOID;
     sexp_opcode_arg1_type(op) = sexp_make_fixnum(SEXP_STRING);
   }
-  op = sexp_define_foreign(ctx, env, "ws_write", 4, sexp_ws_write_stub);
+  op = sexp_define_foreign(ctx, env, "ws_write", 3, sexp_ws_write_stub);
   if (sexp_opcodep(op)) {
     sexp_opcode_return_type(op) = SEXP_VOID;
     sexp_opcode_arg2_type(op) = sexp_make_fixnum(SEXP_STRING);
     sexp_opcode_arg3_type(op) = sexp_make_fixnum(SEXP_FIXNUM);
-    sexp_opcode_argn_type(op) = sexp_make_vector(ctx, SEXP_ONE, sexp_make_fixnum(SEXP_OBJECT));
-    sexp_vector_set(sexp_opcode_argn_type(op), SEXP_ZERO, sexp_make_fixnum(SEXP_FIXNUM));
   }
   op = sexp_define_foreign(ctx, env, "ws_on_message", 3, sexp_ws_on_message_stub);
   if (sexp_opcodep(op)) {
