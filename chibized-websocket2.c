@@ -179,12 +179,8 @@ static void on_http_upgrade(http_s *h, char *requested_protocol, size_t len) {
 static void ws_on_message(ws_s *ws, fio_str_info_s msg, uint8_t is_text) {
  sexp ctx = ctx2;
  msg.data[msg.len--]=NULL;
- 
  sexp_gc_var3(cmd,arg_sym,arg_val); 
  sexp_gc_preserve3(ctx,cmd,arg_sym,arg_val);
- //arg_sym=sexp_intern(ctx, "wsptr", -1); 
- //arg_val=ws;
- //sexp_env_define(ctx, sexp_context_env(ctx), arg_sym, arg_val);
  arg_sym=sexp_intern(ctx, "msg", -1); 
  arg_val=sexp_c_string(ctx,msg.data,-1);
  sexp_env_define(ctx, sexp_context_env(ctx), arg_sym, arg_val);
@@ -204,7 +200,7 @@ static void ws_on_open(ws_s *ws)
 }
 static void ws_on_shutdown(ws_s *ws) {
   websocket_write(
-      ws, (fio_str_info_s){.data = "Server shutting down, goodbye.", .len = 30},
+      ws, (fio_str_info_s){.data = "{\"type\": \"greeting\",\"data\":\"Server shutting down, goodbye.\"}", .len = 60},
       1);
 }
 
