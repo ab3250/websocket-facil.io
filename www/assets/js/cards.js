@@ -23,6 +23,7 @@ let ctx
 
  ws.onclose = function() {
      console.log("closed websocket")
+     ws.send("close")
  }
 
  function sleep(milliseconds) {

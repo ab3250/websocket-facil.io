@@ -3,3 +3,6 @@
 gcc -lchibi-scheme -pthread -Wall -Wextra -O2 \
 	 -I /usr/local/include -I ./lib2/ -std=c99 -pedantic -fPIC
 	 -shared chibized-websocket2.c libfacil.io.a -o websocket.so
+	 
+	 
+	 gcc -lchibi-scheme -pthread -Wall -Wextra -O2 -I /usr/local/include -I ./lib2/ -std=c99 -pedantic -fPIC     -shared chibized-websocket2.c libfacil.io.a -o websocket.so
