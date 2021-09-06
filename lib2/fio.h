@@ -102,6 +102,9 @@ Feel free to copy, use and enjoy according to the license provided.
  *
  *****************************************************************************
  */
+//static void fio_timer_clear_all(void);
+
+
 
 /* *****************************************************************************
 Version and helper macros

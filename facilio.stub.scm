@@ -30,16 +30,19 @@
 ;static void ws_on_message(ws_s *ws, fio_str_info_s msg, uint8_t is_text);
 ;static void ws_on_shutdown(ws_s *ws);
 ;static void ws_on_close(intptr_t uuid, void *udata);
-;static void ws_init(void);
+;static void w_ws_init(void);
 ;(define-c-struct ws_s)
+;static void fio_timer_clear_all(void)
+
+(define-c void fio_timer_clear_all_wrap() )
 (define-c-struct fio_str_info_s)
-(define-c int ws_init())
+(define-c int w_ws_init())
 (define-c int websocket_write(sexp (struct fio_str_info_s)  int))
 (define-c int ws_close_client(int))
 (define-c void ws_on_message(sexp (struct fio_str_info_s) int))
 (define-c void ws_write(sexp string int))
 (define-c void ws_send_str(string))
-(define-c int fio_run_every_wrap(int int string))
+(define-c int w_fio_run_everyrap(int int string))
 
 
 ; (define-c-struct fio_str_info_s

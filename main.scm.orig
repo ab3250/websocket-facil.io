@@ -44,4 +44,4 @@
     ) ;echo
 
 (define (main args)      
-    (ws_init))
+    (w_ws_init))

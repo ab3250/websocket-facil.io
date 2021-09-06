@@ -14,19 +14,16 @@
 static sexp ctx2;
 static void on_http_request(http_s *h);
 static void on_http_upgrade(http_s *h, char *requested_protocol, size_t len);
-static void initialize_cli(int argc, char const *argv[]);
-static void initialize_redis(void);
 static void ws_on_open(ws_s *ws);
 static void ws_on_message(ws_s *ws, fio_str_info_s msg, uint8_t is_text);
 static void ws_on_shutdown(ws_s *ws);
 static void ws_on_close(intptr_t uuid, void *udata);
-static void ws_write(sexp ws, char *msg, int is_text);
+static void w_ws_write(sexp ws, char *msg, int is_text);
 static void ws_on_timer1(void);
 static void ws_on_timer2(void);
 static void ws_send_str(char* str);
 static int rand_int(int n);
 static void shuffle(char *array, int n);
-static void initialize_timers(void);
  
 static int rand_int(int n) {
   int limit = RAND_MAX - RAND_MAX % n;
@@ -60,39 +57,34 @@ static void ws_send_str(char* str) {
   sexp_gc_release3(ctx);
 }
 
-static void initialize_timers(void) {
-  sexp ctx = ctx2;
-  sexp_eval_string(ctx, "(init-timers)", -1, NULL);
-}
-
-static int fio_run_every_wrap(size_t interval, size_t repeat, char *func) {
-  if (strcmp(func , "timer1") == 0){
+static int w_fio_run_every(size_t interval, size_t repeat, char *func) {
+  if (strcmp(func , "set-timer1") == 0){
     fio_run_every(interval, repeat, ws_on_timer1, NULL, NULL);
   }
-  else if (strcmp(func , "timer2") == 0){
-    fio_run_every(interval, repeat, ws_on_timer2, NULL, NULL);
+  else if (strcmp(func , "set-timer2") == 0){
+    fio_run_every(interval, repeat, ws_on_timer2, NULL, NULL);    
   }
   return(0);
 }
 
 static void ws_on_timer1(void) {
  sexp ctx = ctx2; 
- sexp_eval_string(ctx, "(ontimer1)", -1, NULL); 
+ sexp_eval_string(ctx, "(scm-ontimer1)", -1, NULL); 
 }
 
 static void ws_on_timer2(void) {
  sexp ctx = ctx2; 
- sexp_eval_string(ctx, "(ontimer2)", -1, NULL); 
+ sexp_eval_string(ctx, "(scm-ontimer2)", -1, NULL); 
 }
 
-static void ws_write(sexp ws, char *msg, int is_text) {  
+static void w_ws_write(sexp ws, char *msg, int is_text) {  
   fio_str_info_s e;
   e.data = msg;  
   e.len = strlen(msg);
   websocket_write((ws_s *)ws, e, is_text);
 }
 
-static int ws_init(void) {
+static int w_ws_init(void) {
   const char *port = "8080";
   const char *address = "127.0.0.1";
   const char *public_folder = "www";
@@ -113,15 +105,11 @@ static int ws_init(void) {
      perror("ERROR: facil. io couldn't initialize HTTP service (already running?)");
      exit(1);
     }
-  //fio_timer_clear_all(); 
- 
-  fio_run_every(1000, 1, initialize_timers, NULL, NULL);
   
   fio_start(.threads = threads, .workers = workers);
 
 
   //fio_defer(ws_on_timer1, NULL,NULL);
-  //fio_timer_clear_all();
   return(0);
  }
 
@@ -184,7 +172,7 @@ static void ws_on_message(ws_s *ws, fio_str_info_s msg, uint8_t is_text) {
  arg_sym=sexp_intern(ctx, "msg", -1); 
  arg_val=sexp_c_string(ctx,msg.data,-1);
  sexp_env_define(ctx, sexp_context_env(ctx), arg_sym, arg_val);
- cmd = sexp_eval_string(ctx, "(onmessage msg)", -1, NULL);
+ cmd = sexp_eval_string(ctx, "(scm-onmessage msg)", -1, NULL);
  sexp_gc_release3(ctx);
 }
 static void ws_on_open(ws_s *ws) 
@@ -195,7 +183,7 @@ static void ws_on_open(ws_s *ws)
  arg_sym=sexp_intern(ctx, "wsptr", -1); 
  arg_val=ws;
  sexp_env_define(ctx, sexp_context_env(ctx), arg_sym, arg_val);
- cmd = sexp_eval_string(ctx, "(onopen wsptr)", -1, NULL);
+ cmd = sexp_eval_string(ctx, "(scm-onopen wsptr)", -1, NULL);
  sexp_gc_release3(ctx);
 }
 static void ws_on_shutdown(ws_s *ws) {
@@ -219,7 +207,7 @@ static void ws_on_close(intptr_t uuid, void *udata) {
 //  (void)uuid; // we don't use the ID
 }
 
-sexp sexp_fio_run_every_wrap_stub (sexp ctx, sexp self, sexp_sint_t n, sexp arg0, sexp arg1, sexp arg2) {
+sexp sexp_w_fio_run_every_stub (sexp ctx, sexp self, sexp_sint_t n, sexp arg0, sexp arg1, sexp arg2) {
   sexp res;
   if (! sexp_exact_integerp(arg0))
     return sexp_type_exception(ctx, self, SEXP_FIXNUM, arg0);
@@ -227,7 +215,7 @@ sexp sexp_fio_run_every_wrap_stub (sexp ctx, sexp self, sexp_sint_t n, sexp arg0
     return sexp_type_exception(ctx, self, SEXP_FIXNUM, arg1);
   if (! sexp_stringp(arg2))
     return sexp_type_exception(ctx, self, SEXP_STRING, arg2);
-  res = sexp_make_integer(ctx, fio_run_every_wrap(sexp_sint_value(arg0), sexp_sint_value(arg1), sexp_string_data(arg2)));
+  res = sexp_make_integer(ctx, w_fio_run_every(sexp_sint_value(arg0), sexp_sint_value(arg1), sexp_string_data(arg2)));
   return res;
 }
 
@@ -239,13 +227,13 @@ sexp sexp_ws_send_str_stub (sexp ctx, sexp self, sexp_sint_t n, sexp arg0) {
   return res;
 }
 
-sexp sexp_ws_write_stub (sexp ctx, sexp self, sexp_sint_t n, sexp arg0, sexp arg1, sexp arg2) {
+sexp sexp_w_ws_write_stub (sexp ctx, sexp self, sexp_sint_t n, sexp arg0, sexp arg1, sexp arg2) {
   sexp res;
   if (! sexp_stringp(arg1))
     return sexp_type_exception(ctx, self, SEXP_STRING, arg1);
   if (! sexp_exact_integerp(arg2))
     return sexp_type_exception(ctx, self, SEXP_FIXNUM, arg2);
-  res = ((ws_write(arg0, sexp_string_data(arg1), sexp_sint_value(arg2))), SEXP_VOID);
+  res = ((w_ws_write(arg0, sexp_string_data(arg1), sexp_sint_value(arg2))), SEXP_VOID);
   return res;
 }
 sexp sexp_ws_on_message_stub (sexp ctx, sexp self, sexp_sint_t n, sexp arg0, sexp arg1, sexp arg2) {
@@ -276,9 +264,9 @@ sexp sexp_websocket_write_stub (sexp ctx, sexp self, sexp_sint_t n, sexp arg0, s
   return res;
 }
 
-sexp sexp_ws_init_stub (sexp ctx, sexp self, sexp_sint_t n) {
+sexp sexp_w_ws_init_stub (sexp ctx, sexp self, sexp_sint_t n) {
   sexp res;
-  res = sexp_make_integer(ctx, ws_init());
+  res = sexp_make_integer(ctx, w_ws_init());
   return res;
 }
 
@@ -293,7 +281,7 @@ sexp sexp_init_library (sexp ctx, sexp self, sexp_sint_t n, sexp env, const char
   sexp_fio_str_info_s_type_obj = sexp_register_c_type(ctx, name, sexp_finalize_c_type);
   tmp = sexp_string_to_symbol(ctx, name);
   sexp_env_define(ctx, env, tmp, sexp_fio_str_info_s_type_obj);
-  op = sexp_define_foreign(ctx, env, "fio_run_every_wrap", 3, sexp_fio_run_every_wrap_stub);
+  op = sexp_define_foreign(ctx, env, "w_fio_run_every", 3, sexp_w_fio_run_every_stub);
   if (sexp_opcodep(op)) {
     sexp_opcode_return_type(op) = sexp_make_fixnum(SEXP_FIXNUM);
     sexp_opcode_arg1_type(op) = sexp_make_fixnum(SEXP_FIXNUM);
@@ -305,7 +293,7 @@ sexp sexp_init_library (sexp ctx, sexp self, sexp_sint_t n, sexp env, const char
     sexp_opcode_return_type(op) = SEXP_VOID;
     sexp_opcode_arg1_type(op) = sexp_make_fixnum(SEXP_STRING);
   }
-  op = sexp_define_foreign(ctx, env, "ws_write", 3, sexp_ws_write_stub);
+  op = sexp_define_foreign(ctx, env, "w_ws_write", 3, sexp_w_ws_write_stub);
   if (sexp_opcodep(op)) {
     sexp_opcode_return_type(op) = SEXP_VOID;
     sexp_opcode_arg2_type(op) = sexp_make_fixnum(SEXP_STRING);
@@ -328,47 +316,48 @@ sexp sexp_init_library (sexp ctx, sexp self, sexp_sint_t n, sexp env, const char
     sexp_opcode_arg2_type(op) = sexp_make_fixnum(sexp_type_tag(sexp_fio_str_info_s_type_obj));
     sexp_opcode_arg3_type(op) = sexp_make_fixnum(SEXP_FIXNUM);
   }
-  op = sexp_define_foreign(ctx, env, "ws_init", 0, sexp_ws_init_stub);
+  op = sexp_define_foreign(ctx, env, "w_ws_init", 0, sexp_w_ws_init_stub);
   if (sexp_opcodep(op)) {
     sexp_opcode_return_type(op) = sexp_make_fixnum(SEXP_FIXNUM);
   }
+  
   sexp_gc_release3(ctx);
   ctx2 = ctx;  
   sexp_preserve_object(ctx, ctx2);
   return SEXP_VOID;
 }
 
-/**
-// /* struct ws_s {
-//   /** The Websocket protocol */
+
+//  struct ws_s {
+   /** The Websocket protocol */
 //   fio_protocol_s protocol;
-//   /** connection data */
+   /** connection data */
 //   intptr_t fd;
-//   /** callbacks */
+   /** callbacks */
 //   void (*on_message)(ws_s *ws, fio_str_info_s msg, uint8_t is_text);
 //   void (*on_shutdown)(ws_s *ws);
 //   void (*on_ready)(ws_s *ws);
 //   void (*on_open)(ws_s *ws);
 //   void (*on_close)(intptr_t uuid, void *udata);
-//   /** Opaque user data. */
+   /** Opaque user data. */
 //   void *udata;
-//   /** The maximum websocket message size */
+   /** The maximum websocket message size */
 //   size_t max_msg_size;
-//   /** active pub/sub subscriptions */
+   /** active pub/sub subscriptions */
 //   fio_ls_s subscriptions;
 //   fio_lock_i sub_lock;
-//   /** socket buffer. */
+   /** socket buffer. */
 //   struct buffer_s buffer;
-//   /** data length (how much of the buffer actually used). */
+   /** data length (how much of the buffer actually used). */
 //   size_t length;
-//   /** message buffer. */
+   /** message buffer. */
 //   FIOBJ msg;
-//   /** latest text state. */
+   /** latest text state. */
 //   uint8_t is_text;
-//   /** websocket connection type. */
+   /** websocket connection type. */
 //   uint8_t is_client;
 // };
-//  */
+
 // typedef struct fio_str_info_s {
 //   size_t capa; /* Buffer capacity, if the string is writable. */
 //   size_t len;  /* String length. */

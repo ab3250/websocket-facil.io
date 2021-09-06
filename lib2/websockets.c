@@ -55,7 +55,7 @@ struct buffer_s resize_ws_buffer(ws_s *owner, struct buffer_s);
 void free_ws_buffer(ws_s *owner, struct buffer_s);
 
 /** Sets the initial buffer size. (4Kb)*/
-#define WS_INITIAL_BUFFER_SIZE 4096UL
+#define w_ws_initIAL_BUFFER_SIZE 4096UL
 
 /*******************************************************************************
 Buffer management - simple implementation...
@@ -69,7 +69,7 @@ the code probably wouldn't offer a high performance boost.
 struct buffer_s create_ws_buffer(ws_s *owner) {
   (void)(owner);
   struct buffer_s buff;
-  buff.size = WS_INITIAL_BUFFER_SIZE;
+  buff.size = w_ws_initIAL_BUFFER_SIZE;
   buff.data = malloc(buff.size);
   return buff;
 }
